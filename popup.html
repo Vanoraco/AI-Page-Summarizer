@@ -17,75 +17,133 @@
         </svg>
         <h1>AI Summarizer</h1>
       </div>
-      <button id="settingsBtn" class="settings-btn" title="Settings">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/>
-        </svg>
-      </button>
+      <div class="header-controls">
+        <div class="tab-switcher">
+          <button id="summaryTab" class="tab-btn active" data-tab="summary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
+              <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
+              <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2"/>
+              <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Summary
+          </button>
+          <button id="chatTab" class="tab-btn" data-tab="chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Chat
+          </button>
+        </div>
+        <button id="settingsBtn" class="settings-btn" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </button>
+      </div>
     </header>
 
     <main class="main">
-      <!-- Loading State -->
-      <div id="loadingState" class="state loading-state">
-        <div class="spinner"></div>
-        <p>Analyzing page content...</p>
-      </div>
+      <!-- Summary Tab Content -->
+      <div id="summaryContent" class="tab-content active">
+        <!-- Loading State -->
+        <div id="loadingState" class="state loading-state">
+          <div class="spinner"></div>
+          <p>Analyzing page content...</p>
+        </div>
 
-      <!-- Error State -->
-      <div id="errorState" class="state error-state" style="display: none;">
-        <div class="error-icon">⚠️</div>
-        <h3>Something went wrong</h3>
-        <p id="errorMessage">Unable to summarize this page.</p>
-        <button id="retryBtn" class="btn btn-primary">Try Again</button>
-      </div>
+        <!-- Error State -->
+        <div id="errorState" class="state error-state" style="display: none;">
+          <div class="error-icon">⚠️</div>
+          <h3>Something went wrong</h3>
+          <p id="errorMessage">Unable to summarize this page.</p>
+          <button id="retryBtn" class="btn btn-primary">Try Again</button>
+        </div>
 
-      <!-- Success State -->
-      <div id="successState" class="state success-state" style="display: none;">
-        <div class="page-info">
-          <h3 id="pageTitle">Page Title</h3>
-          <p id="pageUrl">https://example.com</p>
-        </div>
-        
-        <div class="summary-container">
-          <h4>Summary</h4>
-          <div id="summaryText" class="summary-text"></div>
-        </div>
-        
-        <div class="actions">
-          <button id="copyBtn" class="btn btn-secondary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            Copy
-          </button>
-          <button id="newSummaryBtn" class="btn btn-primary">New Summary</button>
-        </div>
-      </div>
-
-      <!-- Initial State -->
-      <div id="initialState" class="state initial-state" style="display: none;">
-        <div class="welcome">
-          <h3>Welcome to AI Summarizer</h3>
-          <p>Right-click on any webpage and select "Summarize this page" to get started.</p>
-        </div>
-        
-        <div class="features">
-          <div class="feature">
-            <div class="feature-icon">🤖</div>
-            <h4>AI-Powered</h4>
-            <p>Uses advanced AI to understand and summarize content</p>
+        <!-- Success State -->
+        <div id="successState" class="state success-state" style="display: none;">
+          <div class="page-info">
+            <h3 id="pageTitle">Page Title</h3>
+            <p id="pageUrl">https://example.com</p>
           </div>
-          <div class="feature">
-            <div class="feature-icon">⚡</div>
-            <h4>Fast & Accurate</h4>
-            <p>Get concise summaries in seconds</p>
+
+          <div class="summary-container">
+            <h4>Summary</h4>
+            <div id="summaryText" class="summary-text"></div>
           </div>
-          <div class="feature">
-            <div class="feature-icon">🔒</div>
-            <h4>Privacy First</h4>
-            <p>Your data is processed securely</p>
+
+          <div class="actions">
+            <button id="copyBtn" class="btn btn-secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Copy
+            </button>
+            <button id="newSummaryBtn" class="btn btn-primary">New Summary</button>
+          </div>
+        </div>
+
+        <!-- Initial State -->
+        <div id="initialState" class="state initial-state" style="display: none;">
+          <div class="welcome">
+            <h3>Welcome to AI Summarizer</h3>
+            <p>Right-click on any webpage and select "Summarize this page" to get started.</p>
+          </div>
+
+          <div class="features">
+            <div class="feature">
+              <div class="feature-icon">🤖</div>
+              <h4>AI-Powered</h4>
+              <p>Uses advanced AI to understand and summarize content</p>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">⚡</div>
+              <h4>Fast & Accurate</h4>
+              <p>Get concise summaries in seconds</p>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">🔒</div>
+              <h4>Privacy First</h4>
+              <p>Your data is processed securely</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Tab Content -->
+      <div id="chatContent" class="tab-content" style="display: none;">
+        <div class="chat-container">
+          <div class="chat-header">
+            <h3>Chat about this page</h3>
+            <button id="clearChatBtn" class="btn-icon" title="Clear chat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="3,6 5,6 21,6" stroke="currentColor" stroke-width="2"/>
+                <path d="M19,6v14a2,2 0,0,1-2,2H7a2,2 0,0,1-2-2V6m3,0V4a2,2 0,0,1,2-2h4a2,2 0,0,1,2,2v2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+
+          <div id="chatMessages" class="chat-messages">
+            <div class="chat-welcome">
+              <div class="chat-welcome-icon">💬</div>
+              <h4>Start a conversation</h4>
+              <p>Ask questions about the current page content, request explanations, or get more details about specific topics.</p>
+              <p><strong>💡 Tip:</strong> For best results, try summarizing the page first using the context menu, then switch to chat.</p>
+            </div>
+          </div>
+
+          <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+              <textarea id="chatInput" class="chat-input" placeholder="Ask about this page..." rows="1"></textarea>
+              <button id="sendChatBtn" class="btn-send" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="22" y1="2" x2="11" y2="13" stroke="currentColor" stroke-width="2"/>
+                  <polygon points="22,2 15,22 11,13 2,9 22,2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Page Summarizer - Chat Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .demo-section h2 {
+            color: #495057;
+            margin-top: 0;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .feature-list li:before {
+            content: "✨";
+            margin-right: 10px;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .instructions h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        .code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Page Summarizer with Chat</h1>
+        
+        <div class="demo-section">
+            <h2>Welcome to the Enhanced AI Page Summarizer!</h2>
+            <p>This Chrome extension now features both <strong>summarization</strong> and <strong>interactive chat</strong> capabilities. You can not only get quick summaries of web pages but also have detailed conversations about the content with AI.</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🆕 New Chat Features</h2>
+            <ul class="feature-list">
+                <li><strong>Interactive Chat:</strong> Ask questions about the page content and get detailed answers</li>
+                <li><strong>Context-Aware AI:</strong> The AI understands the current page and provides relevant responses</li>
+                <li><strong>Tab Interface:</strong> Switch between Summary and Chat tabs seamlessly</li>
+                <li><strong>Chat History:</strong> Conversation history is maintained during your session</li>
+                <li><strong>Multiple AI Providers:</strong> Works with OpenAI, Anthropic Claude, and Google Gemini</li>
+                <li><strong>Beautiful UI:</strong> Enhanced neuromorphic design with smooth animations</li>
+            </ul>
+        </div>
+
+        <div class="instructions">
+            <h3>🚀 How to Test the Chat Feature</h3>
+            <ol>
+                <li><strong>Method 1 (Recommended):</strong>
+                    <ul>
+                        <li>Right-click anywhere on this page</li>
+                        <li>Select <span class="code">"Summarize this page"</span> from the context menu</li>
+                        <li>Wait for the summary to appear in the popup</li>
+                        <li>Click the <span class="code">"Chat"</span> tab in the popup</li>
+                    </ul>
+                </li>
+                <li><strong>Method 2 (Direct Chat):</strong>
+                    <ul>
+                        <li>Click the extension icon in your toolbar</li>
+                        <li>Click the <span class="code">"Chat"</span> tab directly</li>
+                        <li>The extension will automatically extract page content</li>
+                    </ul>
+                </li>
+                <li>Try asking questions like:
+                    <ul>
+                        <li>"What are the main features mentioned on this page?"</li>
+                        <li>"How does the chat functionality work?"</li>
+                        <li>"What AI providers are supported?"</li>
+                        <li>"Explain the neuromorphic design mentioned"</li>
+                        <li>"What are the technical requirements?"</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="demo-section">
+            <h2>📋 Sample Content for Testing</h2>
+            <p>This page contains information about artificial intelligence, machine learning, and natural language processing. The AI Page Summarizer extension uses advanced language models to understand and analyze web content.</p>
+            
+            <h3>Artificial Intelligence in Web Browsing</h3>
+            <p>Modern web browsers are increasingly incorporating AI features to enhance user experience. From smart autocomplete to content recommendations, AI is transforming how we interact with web content. The AI Page Summarizer represents the next evolution in this trend, bringing powerful language models directly to your browsing experience.</p>
+            
+            <h3>Technical Implementation</h3>
+            <p>The extension uses Chrome's Manifest V3 architecture for optimal performance and security. It employs content scripts for intelligent text extraction, service workers for background processing, and modern web APIs for seamless integration with AI providers.</p>
+            
+            <h3>Privacy and Security</h3>
+            <p>User privacy is paramount in the design of this extension. API keys are stored locally, all communications are encrypted, and no user data is retained on external servers. The extension communicates directly with AI providers, ensuring your browsing data remains private.</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Chat Examples to Try</h2>
+            <p>Once you have the chat interface open, try these example questions:</p>
+            <ul>
+                <li>"Summarize the key benefits of this extension"</li>
+                <li>"What makes this different from other summarization tools?"</li>
+                <li>"How does the privacy protection work?"</li>
+                <li>"What are the technical requirements?"</li>
+                <li>"Can you explain the AI providers mentioned?"</li>
+                <li>"What is neuromorphic design?"</li>
+            </ul>
+        </div>
+
+        <div class="instructions">
+            <h3>💡 Pro Tips</h3>
+            <ul>
+                <li>The AI has full context of this page content and can answer specific questions</li>
+                <li>You can ask follow-up questions to dive deeper into topics</li>
+                <li>Try asking for explanations, comparisons, or additional details</li>
+                <li>The chat history is maintained during your session for context</li>
+                <li>Use the clear button to start a fresh conversation</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

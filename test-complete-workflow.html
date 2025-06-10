@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Workflow Test - AI Page Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .workflow-step {
+            background: #e9f4ff;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .workflow-step h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-pending { background: #ffc107; }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        
+        .test-results {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .button-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        
+        .test-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Complete Workflow Test</h1>
+        <p>This page tests the complete floating bubble workflow from click to summarization.</p>
+        
+        <div class="button-group">
+            <button class="test-btn" onclick="runCompleteTest()">Run Complete Test</button>
+            <button class="test-btn" onclick="testBubblePresence()">Check Bubble</button>
+            <button class="test-btn" onclick="testContentExtraction()">Test Content</button>
+            <button class="test-btn" onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div class="workflow-step">
+            <h3><span id="step1-status" class="status-indicator status-pending"></span>Step 1: Bubble Presence</h3>
+            <p>Checking if the floating bubble appears on the page...</p>
+            <div id="step1-results" class="test-results">Waiting for test...</div>
+        </div>
+        
+        <div class="workflow-step">
+            <h3><span id="step2-status" class="status-indicator status-pending"></span>Step 2: Content Extraction</h3>
+            <p>Testing if content can be extracted from this page...</p>
+            <div id="step2-results" class="test-results">Waiting for test...</div>
+        </div>
+        
+        <div class="workflow-step">
+            <h3><span id="step3-status" class="status-indicator status-pending"></span>Step 3: Bubble Click</h3>
+            <p>Testing if clicking the bubble triggers the summarization process...</p>
+            <div id="step3-results" class="test-results">Waiting for test...</div>
+        </div>
+        
+        <div class="workflow-step">
+            <h3><span id="step4-status" class="status-indicator status-pending"></span>Step 4: Background Communication</h3>
+            <p>Testing communication between content script and background script...</p>
+            <div id="step4-results" class="test-results">Waiting for test...</div>
+        </div>
+        
+        <div class="workflow-step">
+            <h3><span id="step5-status" class="status-indicator status-pending"></span>Step 5: Popup Integration</h3>
+            <p>Testing if the popup properly handles the floating bubble trigger...</p>
+            <div id="step5-results" class="test-results">Waiting for test...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📄 Sample Content for Testing</h2>
+        <p>This section contains meaningful content that should be extracted and summarized by the AI Page Summarizer extension.</p>
+        
+        <h3>About the AI Page Summarizer</h3>
+        <p>The AI Page Summarizer is a powerful Chrome extension that uses artificial intelligence to create concise summaries of web page content. It supports multiple AI providers including OpenAI GPT, Anthropic Claude, and Google Gemini.</p>
+        
+        <h3>Key Features</h3>
+        <ul>
+            <li><strong>Floating Bubble Interface:</strong> A draggable bubble that provides instant access to summarization</li>
+            <li><strong>Multiple Access Methods:</strong> Right-click context menu, floating bubble, or extension icon</li>
+            <li><strong>Interactive Chat:</strong> Chat with AI about the page content for deeper understanding</li>
+            <li><strong>Smart Content Extraction:</strong> Automatically identifies and extracts meaningful content</li>
+            <li><strong>Privacy-First Design:</strong> API keys stored locally, direct communication with AI providers</li>
+        </ul>
+        
+        <h3>Technical Implementation</h3>
+        <p>The extension uses Chrome's Manifest V3 architecture with content scripts for page interaction, a service worker for background processing, and modern web APIs for seamless integration. The floating bubble is implemented using CSS-in-JS with drag and drop functionality.</p>
+        
+        <h3>User Experience</h3>
+        <p>The floating bubble represents a significant improvement in user experience by making the summarization feature immediately visible and accessible. Users no longer need to remember keyboard shortcuts or navigate context menus to access the functionality.</p>
+    </div>
+
+    <script>
+        let testResults = {
+            step1: { status: 'pending', message: 'Not tested yet' },
+            step2: { status: 'pending', message: 'Not tested yet' },
+            step3: { status: 'pending', message: 'Not tested yet' },
+            step4: { status: 'pending', message: 'Not tested yet' },
+            step5: { status: 'pending', message: 'Not tested yet' }
+        };
+
+        function updateStepStatus(step, status, message) {
+            testResults[step] = { status, message };
+            
+            const statusElement = document.getElementById(`${step}-status`);
+            const resultsElement = document.getElementById(`${step}-results`);
+            
+            statusElement.className = `status-indicator status-${status}`;
+            resultsElement.textContent = message;
+            
+            console.log(`${step}: ${status} - ${message}`);
+        }
+
+        async function testBubblePresence() {
+            updateStepStatus('step1', 'pending', 'Checking for floating bubble...');
+            
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for bubble to appear
+            
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                const rect = bubble.getBoundingClientRect();
+                const isVisible = rect.width > 0 && rect.height > 0;
+                
+                if (isVisible) {
+                    updateStepStatus('step1', 'success', `Bubble found and visible at position (${Math.round(rect.left)}, ${Math.round(rect.top)})`);
+                    return true;
+                } else {
+                    updateStepStatus('step1', 'error', 'Bubble found but not visible');
+                    return false;
+                }
+            } else {
+                updateStepStatus('step1', 'error', 'Floating bubble not found in DOM');
+                return false;
+            }
+        }
+
+        async function testContentExtraction() {
+            updateStepStatus('step2', 'pending', 'Testing content extraction...');
+            
+            try {
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    // Test content extraction via extension API
+                    const response = await new Promise((resolve, reject) => {
+                        chrome.runtime.sendMessage({ action: 'ping' }, (response) => {
+                            if (chrome.runtime.lastError) {
+                                reject(new Error(chrome.runtime.lastError.message));
+                            } else {
+                                resolve(response);
+                            }
+                        });
+                    });
+                    
+                    if (response && response.success) {
+                        const contentLength = document.body.innerText.length;
+                        updateStepStatus('step2', 'success', `Extension communication working. Page content: ${contentLength} characters`);
+                        return true;
+                    } else {
+                        updateStepStatus('step2', 'error', 'Extension ping failed');
+                        return false;
+                    }
+                } else {
+                    updateStepStatus('step2', 'error', 'Chrome extension API not available');
+                    return false;
+                }
+            } catch (error) {
+                updateStepStatus('step2', 'error', `Content extraction failed: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function testBubbleClick() {
+            updateStepStatus('step3', 'pending', 'Testing bubble click functionality...');
+            
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (!bubble) {
+                updateStepStatus('step3', 'error', 'Cannot test click - bubble not found');
+                return false;
+            }
+            
+            try {
+                // Simulate click
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                
+                bubble.dispatchEvent(clickEvent);
+                
+                // Wait a moment to see if anything happens
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                updateStepStatus('step3', 'success', 'Click event dispatched successfully');
+                return true;
+            } catch (error) {
+                updateStepStatus('step3', 'error', `Click test failed: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function testBackgroundCommunication() {
+            updateStepStatus('step4', 'pending', 'Testing background script communication...');
+            
+            try {
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    const response = await new Promise((resolve, reject) => {
+                        chrome.runtime.sendMessage({ action: 'triggerSummarization' }, (response) => {
+                            if (chrome.runtime.lastError) {
+                                reject(new Error(chrome.runtime.lastError.message));
+                            } else {
+                                resolve(response);
+                            }
+                        });
+                    });
+                    
+                    if (response && response.success) {
+                        updateStepStatus('step4', 'success', 'Background communication successful');
+                        return true;
+                    } else {
+                        updateStepStatus('step4', 'error', `Background communication failed: ${response?.error || 'Unknown error'}`);
+                        return false;
+                    }
+                } else {
+                    updateStepStatus('step4', 'error', 'Chrome extension API not available');
+                    return false;
+                }
+            } catch (error) {
+                updateStepStatus('step4', 'error', `Background communication error: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function testPopupIntegration() {
+            updateStepStatus('step5', 'pending', 'Testing popup integration...');
+            
+            try {
+                // Check if content was stored for popup processing
+                if (typeof chrome !== 'undefined' && chrome.storage) {
+                    const data = await chrome.storage.local.get(['isProcessing', 'currentContent']);
+                    
+                    if (data.isProcessing || data.currentContent) {
+                        updateStepStatus('step5', 'success', `Popup integration working. Processing: ${!!data.isProcessing}, Content: ${!!data.currentContent}`);
+                        return true;
+                    } else {
+                        updateStepStatus('step5', 'error', 'No processing state or content found for popup');
+                        return false;
+                    }
+                } else {
+                    updateStepStatus('step5', 'error', 'Chrome storage API not available');
+                    return false;
+                }
+            } catch (error) {
+                updateStepStatus('step5', 'error', `Popup integration test failed: ${error.message}`);
+                return false;
+            }
+        }
+
+        async function runCompleteTest() {
+            console.log('Starting complete workflow test...');
+            
+            // Run tests in sequence
+            const step1Success = await testBubblePresence();
+            if (!step1Success) return;
+            
+            const step2Success = await testContentExtraction();
+            if (!step2Success) return;
+            
+            const step3Success = await testBubbleClick();
+            if (!step3Success) return;
+            
+            const step4Success = await testBackgroundCommunication();
+            if (!step4Success) return;
+            
+            const step5Success = await testPopupIntegration();
+            
+            if (step5Success) {
+                console.log('✅ All tests passed! Floating bubble workflow is working correctly.');
+            } else {
+                console.log('❌ Some tests failed. Check the results above.');
+            }
+        }
+
+        function clearResults() {
+            Object.keys(testResults).forEach(step => {
+                updateStepStatus(step, 'pending', 'Waiting for test...');
+            });
+        }
+
+        // Auto-run bubble presence test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(testBubblePresence, 2000);
+        });
+    </script>
+</body>
+</html>

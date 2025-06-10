@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble State Management Test - AI Page Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f7fa;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .state-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .state-default { background: #e9ecef; color: #495057; }
+        .state-processing { background: #d4edda; color: #155724; }
+        .state-success { background: #d1ecf1; color: #0c5460; }
+        .state-error { background: #f8d7da; color: #721c24; }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #bbdefb;
+            margin: 20px 0;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .status-log {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+        
+        .workflow-step {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .workflow-step h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Bubble State Management Test</h1>
+        
+        <div class="instructions">
+            <h3>📋 Test Instructions</h3>
+            <p>This page tests the floating bubble state management throughout the summarization workflow:</p>
+            <ol>
+                <li><strong>Click the floating bubble</strong> to start summarization</li>
+                <li><strong>Watch the bubble text change</strong> to "Processing..."</li>
+                <li><strong>Wait for summarization to complete</strong></li>
+                <li><strong>Verify the bubble resets</strong> to "Summarize" after completion</li>
+                <li><strong>Test different scenarios</strong> using the buttons below</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🎛️ Manual Test Controls</h3>
+            <button class="test-button" onclick="simulateBubbleClick()">Simulate Bubble Click</button>
+            <button class="test-button" onclick="checkBubbleState()">Check Bubble State</button>
+            <button class="test-button" onclick="resetBubbleManually()">Reset Bubble</button>
+            <button class="test-button" onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Current Bubble State</h3>
+            <p>Bubble Text: <span id="bubbleText" class="state-indicator state-default">Unknown</span></p>
+            <p>Bubble Color: <span id="bubbleColor" class="state-indicator state-default">Unknown</span></p>
+            <p>Last Updated: <span id="lastUpdated">Never</span></p>
+        </div>
+
+        <div class="status-log" id="statusLog">Status log will appear here...\n</div>
+    </div>
+
+    <div class="container">
+        <h2>🔄 Expected Workflow</h2>
+        
+        <div class="workflow-step">
+            <h4>Step 1: Initial State</h4>
+            <p><span class="state-indicator state-default">Summarize</span> - Default blue gradient background</p>
+        </div>
+        
+        <div class="workflow-step">
+            <h4>Step 2: Processing State</h4>
+            <p><span class="state-indicator state-processing">Processing...</span> - Green gradient background</p>
+        </div>
+        
+        <div class="workflow-step">
+            <h4>Step 3: Success State</h4>
+            <p><span class="state-indicator state-success">Complete!</span> - Green background (2 seconds)</p>
+        </div>
+        
+        <div class="workflow-step">
+            <h4>Step 4: Reset State</h4>
+            <p><span class="state-indicator state-default">Summarize</span> - Back to default blue gradient</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📄 Sample Content for Testing</h2>
+        <p>This page contains sample content for testing the AI Page Summarizer bubble state management.</p>
+        
+        <h3>State Management Features</h3>
+        <ul>
+            <li><strong>Visual Feedback:</strong> Bubble changes appearance during different states</li>
+            <li><strong>Text Updates:</strong> Bubble text reflects current operation status</li>
+            <li><strong>Auto-Reset:</strong> Bubble automatically returns to default state after completion</li>
+            <li><strong>Error Handling:</strong> Bubble shows error state and auto-recovers</li>
+            <li><strong>Popup Integration:</strong> State syncs between bubble and popup interface</li>
+        </ul>
+        
+        <h3>Technical Implementation</h3>
+        <p>The bubble state management uses Chrome extension message passing to communicate between the content script (bubble), background script (processing), and popup script (UI). This ensures the bubble always reflects the current operation status.</p>
+        
+        <h3>User Experience Benefits</h3>
+        <p>Clear visual feedback helps users understand what's happening when they interact with the floating bubble. The automatic state reset ensures the bubble is always ready for the next interaction without manual intervention.</p>
+    </div>
+
+    <script>
+        let statusLog = document.getElementById('statusLog');
+        
+        function logStatus(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '📝';
+            const logMessage = `[${timestamp}] ${prefix} ${message}\n`;
+            
+            statusLog.textContent += logMessage;
+            statusLog.scrollTop = statusLog.scrollHeight;
+            
+            console.log(message);
+        }
+        
+        function updateBubbleDisplay() {
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                const bubbleText = bubble.querySelector('.bubble-text');
+                const computedStyle = window.getComputedStyle(bubble);
+                
+                document.getElementById('bubbleText').textContent = bubbleText ? bubbleText.textContent : 'Not found';
+                document.getElementById('bubbleColor').textContent = computedStyle.background || 'Unknown';
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+                
+                // Update state indicators
+                const textElement = document.getElementById('bubbleText');
+                const colorElement = document.getElementById('bubbleColor');
+                
+                textElement.className = 'state-indicator';
+                colorElement.className = 'state-indicator';
+                
+                if (bubbleText && bubbleText.textContent.includes('Processing')) {
+                    textElement.className += ' state-processing';
+                    colorElement.className += ' state-processing';
+                } else if (bubbleText && bubbleText.textContent.includes('Complete')) {
+                    textElement.className += ' state-success';
+                    colorElement.className += ' state-success';
+                } else if (bubbleText && bubbleText.textContent.includes('Error')) {
+                    textElement.className += ' state-error';
+                    colorElement.className += ' state-error';
+                } else {
+                    textElement.className += ' state-default';
+                    colorElement.className += ' state-default';
+                }
+                
+                return true;
+            }
+            return false;
+        }
+        
+        function simulateBubbleClick() {
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                logStatus('Simulating bubble click...');
+                bubble.click();
+                setTimeout(updateBubbleDisplay, 100);
+            } else {
+                logStatus('Bubble not found for simulation', 'error');
+            }
+        }
+        
+        function checkBubbleState() {
+            logStatus('Checking bubble state...');
+            if (updateBubbleDisplay()) {
+                logStatus('Bubble state updated successfully', 'success');
+            } else {
+                logStatus('Bubble not found', 'error');
+            }
+        }
+        
+        function resetBubbleManually() {
+            if (typeof chrome !== 'undefined' && chrome.tabs) {
+                chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                    if (tabs[0]) {
+                        chrome.tabs.sendMessage(tabs[0].id, {
+                            action: 'resetBubbleState'
+                        }, (response) => {
+                            if (chrome.runtime.lastError) {
+                                logStatus('Failed to reset bubble: ' + chrome.runtime.lastError.message, 'error');
+                            } else {
+                                logStatus('Bubble reset command sent', 'success');
+                                setTimeout(updateBubbleDisplay, 100);
+                            }
+                        });
+                    }
+                });
+            } else {
+                logStatus('Chrome extension API not available', 'error');
+            }
+        }
+        
+        function clearLog() {
+            statusLog.textContent = 'Status log cleared...\n';
+        }
+        
+        // Auto-update bubble display every 2 seconds
+        setInterval(updateBubbleDisplay, 2000);
+        
+        // Initial setup
+        logStatus('Bubble state test page loaded');
+        setTimeout(() => {
+            if (updateBubbleDisplay()) {
+                logStatus('Initial bubble state captured', 'success');
+            } else {
+                logStatus('Waiting for bubble to appear...', 'info');
+            }
+        }, 1000);
+        
+        // Monitor for bubble state changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                    const bubble = document.getElementById('ai-summarizer-bubble');
+                    if (bubble && (mutation.target === bubble || bubble.contains(mutation.target))) {
+                        logStatus('Bubble state change detected');
+                        updateBubbleDisplay();
+                    }
+                }
+            });
+        });
+        
+        // Start observing after bubble appears
+        setTimeout(() => {
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                observer.observe(bubble, {
+                    childList: true,
+                    attributes: true,
+                    subtree: true,
+                    attributeFilter: ['style', 'class']
+                });
+                logStatus('Started monitoring bubble state changes', 'success');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AI Page Summarizer",
-  "version": "1.0.0",
-  "description": "AI-powered webpage summarization with OpenAI, Anthropic Claude, and Google Gemini. Right-click any page for instant summaries.",
+  "version": "1.2.0",
+  "description": "AI-powered webpage summarization and chat with floating bubble access. Features OpenAI, Anthropic Claude, and Google Gemini integration.",
   
   "permissions": [
     "contextMenus",

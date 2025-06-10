@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Click Test - AI Page Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            background: #f0f2f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .instructions {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin: 20px 0;
+        }
+        
+        .debug-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+            margin: 20px 0;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        #console-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🫧 Floating Bubble Click Test</h1>
+        
+        <div class="instructions">
+            <h3>📋 Test Instructions</h3>
+            <ol>
+                <li><strong>Look for the floating bubble</strong> - It should appear on this page</li>
+                <li><strong>Try clicking the bubble</strong> - It should trigger summarization</li>
+                <li><strong>Watch the console output below</strong> - Debug messages will appear</li>
+                <li><strong>Test dragging</strong> - Drag the bubble to move it</li>
+                <li><strong>Test clicking after dragging</strong> - Make sure it still works</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Debug Tools</h3>
+            <button class="test-button" onclick="testBubbleClick()">Test Bubble Click</button>
+            <button class="test-button" onclick="findBubble()">Find Bubble</button>
+            <button class="test-button" onclick="clearConsole()">Clear Console</button>
+            <button class="test-button" onclick="checkBubbleState()">Check Bubble State</button>
+        </div>
+
+        <div class="debug-info">
+            <h4>🐛 Debug Console</h4>
+            <div id="console-output">Waiting for debug messages...\n</div>
+        </div>
+
+        <div class="test-section">
+            <h3>📄 Sample Content</h3>
+            <p>This is sample content for the AI to summarize. The floating bubble should allow you to quickly access the summarization feature without needing to right-click or use the extension icon.</p>
+            
+            <h4>Key Features to Test:</h4>
+            <ul>
+                <li><strong>Click Functionality:</strong> Single click should trigger summarization</li>
+                <li><strong>Drag Functionality:</strong> Click and drag should move the bubble</li>
+                <li><strong>Visual Feedback:</strong> Bubble should show visual feedback when clicked</li>
+                <li><strong>State Management:</strong> Click should work after dragging</li>
+            </ul>
+            
+            <h4>Expected Behavior:</h4>
+            <ul>
+                <li>Quick click (under 300ms, no movement) = Summarization</li>
+                <li>Click and drag (movement > 8px) = Move bubble</li>
+                <li>Bubble text changes to "Processing..." when clicked</li>
+                <li>Bubble color briefly changes to green when clicked</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Test Scenarios</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <h4>Scenario 1: Basic Click</h4>
+                    <ol>
+                        <li>Find the floating bubble</li>
+                        <li>Single click on it</li>
+                        <li>Verify summarization starts</li>
+                        <li>Check console for messages</li>
+                    </ol>
+                </div>
+                
+                <div>
+                    <h4>Scenario 2: Drag then Click</h4>
+                    <ol>
+                        <li>Drag bubble to new position</li>
+                        <li>Release the drag</li>
+                        <li>Click the bubble</li>
+                        <li>Verify click still works</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Troubleshooting</h3>
+            <p><strong>If the bubble is not clickable:</strong></p>
+            <ul>
+                <li>Check browser console (F12) for JavaScript errors</li>
+                <li>Verify the bubble element exists in the DOM</li>
+                <li>Check if event listeners are properly attached</li>
+                <li>Try refreshing the page</li>
+                <li>Use the debug tools above to test functionality</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Capture console messages
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : '📝';
+            consoleOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        // Test functions
+        function testBubbleClick() {
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                console.log('Found bubble, simulating click...');
+                bubble.click();
+            } else {
+                console.error('Bubble not found!');
+            }
+        }
+        
+        function findBubble() {
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                console.log('Bubble found:', bubble);
+                console.log('Bubble position:', bubble.getBoundingClientRect());
+                console.log('Bubble styles:', window.getComputedStyle(bubble).cssText);
+                
+                // Highlight the bubble
+                bubble.style.boxShadow = '0 0 20px #ff0000, 0 8px 32px rgba(102, 126, 234, 0.3)';
+                setTimeout(() => {
+                    bubble.style.boxShadow = '0 8px 32px rgba(102, 126, 234, 0.3)';
+                }, 2000);
+            } else {
+                console.error('Bubble not found in DOM');
+            }
+        }
+        
+        function clearConsole() {
+            consoleOutput.textContent = 'Console cleared...\n';
+        }
+        
+        function checkBubbleState() {
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                console.log('Bubble state check:');
+                console.log('- Visible:', bubble.style.display !== 'none');
+                console.log('- Position:', bubble.style.position);
+                console.log('- Z-index:', bubble.style.zIndex);
+                console.log('- Cursor:', window.getComputedStyle(bubble).cursor);
+                
+                const bubbleContent = bubble.querySelector('.bubble-content');
+                if (bubbleContent) {
+                    console.log('- Content cursor:', window.getComputedStyle(bubbleContent).cursor);
+                    console.log('- Event listeners:', getEventListeners ? getEventListeners(bubbleContent) : 'DevTools required');
+                }
+            } else {
+                console.error('Bubble not found for state check');
+            }
+        }
+        
+        // Page load message
+        console.log('Bubble click test page loaded');
+        console.log('Waiting for floating bubble to appear...');
+        
+        // Check for bubble every second
+        let checkCount = 0;
+        const checkInterval = setInterval(() => {
+            checkCount++;
+            const bubble = document.getElementById('ai-summarizer-bubble');
+            if (bubble) {
+                console.log('Floating bubble detected!');
+                clearInterval(checkInterval);
+            } else if (checkCount >= 10) {
+                console.error('Floating bubble not found after 10 seconds');
+                clearInterval(checkInterval);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

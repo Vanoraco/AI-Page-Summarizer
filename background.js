@@ -154,8 +154,21 @@ function extractPageContent() {
   return content;
 }
 
-// Handle messages from popup
+// Handle messages from popup and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "triggerSummarization") {
+    // Handle summarization triggered from floating bubble
+    debugLog('Received triggerSummarization request from floating bubble');
+    if (sender.tab) {
+      handleFloatingBubbleSummarization(sender.tab);
+      sendResponse({ success: true });
+    } else {
+      debugLog('No tab information available for floating bubble summarization');
+      sendResponse({ success: false, error: 'No tab information available' });
+    }
+    return true;
+  }
+
   if (request.action === "summarize") {
     debugLog('Received summarization request', {
       contentLength: request.content?.length || 0,
@@ -175,6 +188,41 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.action.setBadgeText({ text: "!" });
       });
     return true; // Keep message channel open for async response
+  }
+
+  // Handle chat requests
+  if (request.action === "chat") {
+    debugLog('Received chat request', {
+      messageLength: request.message?.length || 0,
+      provider: request.provider,
+      hasApiKey: !!request.apiKey,
+      hasPageContent: !!request.pageContent
+    });
+
+    // Set a timeout to ensure we always respond
+    const timeoutId = setTimeout(() => {
+      debugLog('Chat request timed out');
+      sendResponse({ success: false, error: 'Request timed out. Please try again.' });
+    }, 25000); // 25 second timeout
+
+    chatWithAI(request.message, request.chatHistory, request.pageContent, request.pageUrl, request.pageTitle, request.apiKey, request.provider)
+      .then(reply => {
+        clearTimeout(timeoutId);
+        debugLog('Chat successful', { replyLength: reply?.length || 0 });
+        sendResponse({ success: true, reply });
+      })
+      .catch(error => {
+        clearTimeout(timeoutId);
+        debugLog('Chat failed', error);
+        sendResponse({ success: false, error: error.message || 'An unknown error occurred' });
+      });
+    return true; // Keep message channel open for async response
+  }
+
+  // Handle ping requests
+  if (request.action === "ping") {
+    sendResponse({ success: true, message: 'pong' });
+    return true;
   }
 
   // Handle debug info requests
@@ -339,4 +387,392 @@ async function summarizeWithGemini(content, apiKey) {
   }
 
   return data.candidates[0].content.parts[0].text.trim();
+}
+
+// Chat with AI function
+async function chatWithAI(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey, provider) {
+  debugLog('Starting chat with AI', {
+    provider,
+    messageLength: message?.length || 0,
+    historyLength: chatHistory?.length || 0,
+    hasPageContent: !!pageContent
+  });
+
+  if (!apiKey) {
+    throw new Error('API key is required');
+  }
+
+  if (!message) {
+    throw new Error('Message is required');
+  }
+
+  try {
+    let reply;
+    if (provider === 'openai') {
+      reply = await chatWithOpenAI(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey);
+    } else if (provider === 'anthropic') {
+      reply = await chatWithAnthropic(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey);
+    } else if (provider === 'gemini') {
+      reply = await chatWithGemini(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey);
+    } else {
+      throw new Error('Unsupported AI provider');
+    }
+
+    debugLog('Chat completed successfully');
+    return reply;
+  } catch (error) {
+    debugLog('Chat error', error);
+    throw error;
+  }
+}
+
+// OpenAI Chat API integration
+async function chatWithOpenAI(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey) {
+  // Limit content to avoid token limits
+  const limitedContent = pageContent ? pageContent.substring(0, 2000) + (pageContent.length > 2000 ? '...' : '') : null;
+
+  let systemPrompt = `You are a helpful AI assistant that can answer questions about web page content.`;
+
+  if (limitedContent && limitedContent.trim().length > 50) {
+    systemPrompt += ` You have access to the content of the current webpage and can help users understand, analyze, and discuss it.
+
+Current page information:
+- Title: ${pageTitle || 'Unknown'}
+- URL: ${pageUrl || 'Unknown'}
+- Content: ${limitedContent}
+
+Please provide helpful, accurate, and contextual responses based on the page content. Reference specific parts of the content when answering questions.`;
+  } else {
+    systemPrompt += ` The current page content is not available or could not be extracted. You can still help with general questions, but let the user know if they ask about specific page content that you don't have access to it.
+
+Current page information:
+- Title: ${pageTitle || 'Unknown'}
+- URL: ${pageUrl || 'Unknown'}
+- Content: Not available
+
+If the user asks about the page content, politely explain that you cannot access the page content and suggest they try summarizing the page first.`;
+  }
+
+  const messages = [
+    {
+      role: 'system',
+      content: systemPrompt
+    }
+  ];
+
+  // Add chat history (limit to last 6 messages to avoid token limits)
+  if (chatHistory && chatHistory.length > 0) {
+    messages.push(...chatHistory.slice(-6));
+  }
+
+  // Add current message
+  messages.push({
+    role: 'user',
+    content: message
+  });
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      messages: messages,
+      max_tokens: 300,
+      temperature: 0.7,
+      timeout: 20000
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage = 'Failed to get chat response from OpenAI';
+    try {
+      const errorData = JSON.parse(errorText);
+      errorMessage = errorData.error?.message || errorMessage;
+    } catch (e) {
+      // If we can't parse the error, use the status text
+      errorMessage = `OpenAI API error: ${response.status} ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+
+  const data = await response.json();
+
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    throw new Error('Invalid response format from OpenAI');
+  }
+
+  return data.choices[0].message.content.trim();
+}
+
+// Anthropic Chat API integration
+async function chatWithAnthropic(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey) {
+  // Limit content to avoid token limits
+  const limitedContent = pageContent ? pageContent.substring(0, 2000) + (pageContent.length > 2000 ? '...' : '') : null;
+
+  let conversationText = `You are a helpful AI assistant that can answer questions about web page content.
+
+Current page information:
+- Title: ${pageTitle || 'Unknown'}
+- URL: ${pageUrl || 'Unknown'}`;
+
+  if (limitedContent && limitedContent.trim().length > 50) {
+    conversationText += `
+- Content: ${limitedContent}
+
+Please provide helpful, accurate, and contextual responses based on the page content. Reference specific parts of the content when answering questions.`;
+  } else {
+    conversationText += `
+- Content: Not available
+
+The page content could not be extracted or accessed. If the user asks about specific page content, politely explain that you cannot access it and suggest they try summarizing the page first. You can still help with general questions.`;
+  }
+
+  conversationText += `
+
+`;
+
+  // Add chat history (limit to last 6 messages)
+  if (chatHistory && chatHistory.length > 0) {
+    const recentHistory = chatHistory.slice(-6);
+    for (const msg of recentHistory) {
+      conversationText += `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}\n\n`;
+    }
+  }
+
+  conversationText += `Human: ${message}\n\nAssistant:`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 300,
+      messages: [
+        {
+          role: 'user',
+          content: conversationText
+        }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage = 'Failed to get chat response from Anthropic';
+    try {
+      const errorData = JSON.parse(errorText);
+      errorMessage = errorData.error?.message || errorMessage;
+    } catch (e) {
+      errorMessage = `Anthropic API error: ${response.status} ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+
+  const data = await response.json();
+
+  if (!data.content || !data.content[0] || !data.content[0].text) {
+    throw new Error('Invalid response format from Anthropic');
+  }
+
+  return data.content[0].text.trim();
+}
+
+// Google Gemini Chat API integration
+async function chatWithGemini(message, chatHistory, pageContent, pageUrl, pageTitle, apiKey) {
+  // Limit content to avoid token limits
+  const limitedContent = pageContent ? pageContent.substring(0, 2000) + (pageContent.length > 2000 ? '...' : '') : null;
+
+  let conversationText = `You are a helpful AI assistant that can answer questions about web page content.
+
+Current page information:
+- Title: ${pageTitle || 'Unknown'}
+- URL: ${pageUrl || 'Unknown'}`;
+
+  if (limitedContent && limitedContent.trim().length > 50) {
+    conversationText += `
+- Content: ${limitedContent}
+
+Please provide helpful, accurate, and contextual responses based on the page content. Reference specific parts of the content when answering questions.`;
+  } else {
+    conversationText += `
+- Content: Not available
+
+The page content could not be extracted or accessed. If the user asks about specific page content, politely explain that you cannot access it and suggest they try summarizing the page first. You can still help with general questions.`;
+  }
+
+  conversationText += `
+
+`;
+
+  // Add chat history (limit to last 6 messages)
+  if (chatHistory && chatHistory.length > 0) {
+    const recentHistory = chatHistory.slice(-6);
+    for (const msg of recentHistory) {
+      conversationText += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n\n`;
+    }
+  }
+
+  conversationText += `User: ${message}`;
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [
+            {
+              text: conversationText
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 300,
+        stopSequences: []
+      },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage = 'Failed to get chat response from Google Gemini';
+    try {
+      const errorData = JSON.parse(errorText);
+      errorMessage = errorData.error?.message || errorMessage;
+    } catch (e) {
+      errorMessage = `Gemini API error: ${response.status} ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+
+  const data = await response.json();
+
+  if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+    throw new Error('Invalid response format from Google Gemini');
+  }
+
+  return data.candidates[0].content.parts[0].text.trim();
+}
+
+// Extract content from a specific tab
+async function extractContentFromTab(tabId) {
+  debugLog('Extracting content from tab', { tabId });
+
+  try {
+    const response = await chrome.tabs.sendMessage(tabId, { action: "extractContent" });
+
+    if (response && response.success) {
+      debugLog('Content extracted successfully', { contentLength: response.content?.length || 0 });
+      return response.content;
+    } else {
+      debugLog('Content extraction failed', response);
+      return null;
+    }
+  } catch (error) {
+    debugLog('Error extracting content from tab', error);
+    return null;
+  }
+}
+
+// Handle summarization triggered from floating bubble
+async function handleFloatingBubbleSummarization(tab) {
+  debugLog('Floating bubble summarization triggered', { tabId: tab.id, url: tab.url });
+
+  try {
+    // Extract content from the page
+    const pageContent = await extractContentFromTab(tab.id);
+
+    if (!pageContent) {
+      debugLog('Failed to extract content from tab');
+      // Set badge to indicate error
+      chrome.action.setBadgeText({ text: "!" });
+      // Notify content script of error
+      try {
+        await chrome.tabs.sendMessage(tab.id, {
+          action: 'updateBubbleState',
+          state: 'error'
+        });
+      } catch (e) {
+        debugLog('Could not update bubble state', e);
+      }
+      return;
+    }
+
+    // Store the content and trigger popup
+    debugLog('Storing content and preparing for summarization');
+    await chrome.storage.local.set({
+      currentContent: pageContent,
+      currentUrl: tab.url,
+      currentTitle: tab.title,
+      isProcessing: true,
+      extractedAt: Date.now(),
+      bubbleTriggered: true, // Flag to track bubble-triggered summarization
+      bubbleTabId: tab.id // Store tab ID for later communication
+    });
+
+    // Set badge to indicate processing
+    chrome.action.setBadgeText({ text: "..." });
+
+    // Try to open popup
+    try {
+      chrome.action.openPopup();
+      debugLog('Popup opened from floating bubble');
+    } catch (popupError) {
+      debugLog('Could not auto-open popup from floating bubble', popupError);
+      // Set a more obvious badge to indicate user should click
+      chrome.action.setBadgeText({ text: "📄" });
+    }
+
+  } catch (error) {
+    debugLog('Error in floating bubble summarization', error);
+    chrome.action.setBadgeText({ text: "!" });
+
+    // Notify content script of error
+    try {
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'updateBubbleState',
+        state: 'error'
+      });
+    } catch (e) {
+      debugLog('Could not update bubble state', e);
+    }
+
+    // Store error for popup to display
+    await chrome.storage.local.set({
+      lastError: error.message,
+      isProcessing: false
+    });
+  }
 }

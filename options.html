@@ -65,6 +65,33 @@
       </div>
 
       <div class="settings-section">
+        <h2>Interface Settings</h2>
+        <p class="section-description">
+          Customize how the extension appears and behaves on web pages.
+        </p>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="showFloatingBubble" checked>
+            <span class="checkmark"></span>
+            Show floating summarize bubble on pages
+          </label>
+          <small class="help-text">Display a draggable bubble on web pages for quick access to summarization.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="bubblePosition">Default bubble position</label>
+          <select id="bubblePosition" class="form-control">
+            <option value="top-right">Top Right</option>
+            <option value="top-left">Top Left</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="bottom-left">Bottom Left</option>
+          </select>
+          <small class="help-text">Choose where the bubble appears initially (you can always drag it to move).</small>
+        </div>
+      </div>
+
+      <div class="settings-section">
         <h2>How to Get API Keys</h2>
         
         <div class="provider-info">

@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const testBtn = document.getElementById('testBtn');
   const statusMessage = document.getElementById('statusMessage');
   const getApiKeyLink = document.getElementById('getApiKeyLink');
-  
+  const showFloatingBubbleCheckbox = document.getElementById('showFloatingBubble');
+  const bubblePositionSelect = document.getElementById('bubblePosition');
+
   // Load saved settings
   await loadSettings();
   
@@ -26,15 +28,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load settings from storage
   async function loadSettings() {
     try {
-      const settings = await chrome.storage.sync.get(['provider', 'apiKey']);
-      
-      if (settings.provider) {
-        providerSelect.value = settings.provider;
+      const syncSettings = await chrome.storage.sync.get(['provider', 'apiKey', 'showFloatingBubble', 'bubblePosition']);
+      const localSettings = await chrome.storage.local.get(['bubbleVisible']);
+
+      if (syncSettings.provider) {
+        providerSelect.value = syncSettings.provider;
       }
-      
-      if (settings.apiKey) {
-        apiKeyInput.value = settings.apiKey;
+
+      if (syncSettings.apiKey) {
+        apiKeyInput.value = syncSettings.apiKey;
       }
+
+      // Load floating bubble settings
+      const showBubble = syncSettings.showFloatingBubble !== false; // Default to true
+      showFloatingBubbleCheckbox.checked = showBubble;
+
+      if (syncSettings.bubblePosition) {
+        bubblePositionSelect.value = syncSettings.bubblePosition;
+      }
+
     } catch (error) {
       console.error('Error loading settings:', error);
     }
@@ -44,25 +56,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function saveSettings() {
     const provider = providerSelect.value;
     const apiKey = apiKeyInput.value.trim();
-    
+    const showFloatingBubble = showFloatingBubbleCheckbox.checked;
+    const bubblePosition = bubblePositionSelect.value;
+
     if (!apiKey) {
       showStatus('Please enter an API key', 'error');
       return;
     }
-    
+
     try {
       await chrome.storage.sync.set({
         provider: provider,
-        apiKey: apiKey
+        apiKey: apiKey,
+        showFloatingBubble: showFloatingBubble,
+        bubblePosition: bubblePosition
       });
-      
+
+      // Update bubble visibility on all tabs
+      await updateBubbleVisibility(showFloatingBubble);
+
       showStatus('Settings saved successfully!', 'success');
-      
+
       // Auto-hide success message after 3 seconds
       setTimeout(() => {
         hideStatus();
       }, 3000);
-      
+
     } catch (error) {
       console.error('Error saving settings:', error);
       showStatus('Failed to save settings. Please try again.', 'error');
@@ -259,5 +278,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Clear status when user types
   function clearStatus() {
     hideStatus();
+  }
+
+  // Update bubble visibility on all tabs
+  async function updateBubbleVisibility(showBubble) {
+    try {
+      const tabs = await chrome.tabs.query({});
+
+      for (const tab of tabs) {
+        try {
+          if (tab.url.startsWith('http://') || tab.url.startsWith('https://')) {
+            await chrome.tabs.sendMessage(tab.id, {
+              action: showBubble ? 'showFloatingBubble' : 'hideFloatingBubble'
+            });
+          }
+        } catch (error) {
+          // Ignore errors for tabs that don't have content script
+          console.log('Could not update bubble on tab:', tab.id, error.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating bubble visibility:', error);
+    }
   }
 });

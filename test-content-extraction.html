@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Extraction Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AI Page Summarizer - Content Extraction Test</h1>
+        <p>This page is designed to test the content extraction and chat functionality of the AI Page Summarizer extension.</p>
+    </header>
+
+    <main>
+        <div class="instructions">
+            <h2>🧪 Testing Instructions</h2>
+            <ol>
+                <li>Open the browser console (F12 → Console tab)</li>
+                <li>Click the extension icon to open the popup</li>
+                <li>In the console, type: <code class="code">testContentExtraction()</code></li>
+                <li>Check if content is extracted successfully</li>
+                <li>Try the chat functionality with questions about this page</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>📄 Main Content Section</h2>
+            <p>This is the main content that should be extracted by the extension. It contains meaningful text that the AI should be able to analyze and discuss.</p>
+            
+            <h3>Key Features to Test</h3>
+            <ul>
+                <li><strong>Content Extraction:</strong> The extension should extract this text from the page</li>
+                <li><strong>Chat Context:</strong> The AI should be able to reference this content in conversations</li>
+                <li><strong>Question Answering:</strong> Ask specific questions about the content on this page</li>
+                <li><strong>Error Handling:</strong> Test what happens when content cannot be extracted</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🤖 AI Chat Test Scenarios</h2>
+            <p>Try asking the AI these questions to test the chat functionality:</p>
+            
+            <h3>Content-Specific Questions:</h3>
+            <ul>
+                <li>"What is this page about?"</li>
+                <li>"What are the key features mentioned?"</li>
+                <li>"What testing instructions are provided?"</li>
+                <li>"How many test scenarios are listed?"</li>
+            </ul>
+
+            <h3>Analysis Questions:</h3>
+            <ul>
+                <li>"Summarize the main points of this page"</li>
+                <li>"What is the purpose of this test page?"</li>
+                <li>"What should I do to test the extension?"</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Technical Information</h2>
+            <p>This section contains technical details about the AI Page Summarizer extension that the AI should be able to discuss:</p>
+            
+            <h3>Extension Architecture:</h3>
+            <ul>
+                <li><strong>Manifest V3:</strong> Uses the latest Chrome extension architecture</li>
+                <li><strong>Content Scripts:</strong> Extract meaningful content from web pages</li>
+                <li><strong>Background Service Worker:</strong> Handles API communication</li>
+                <li><strong>Popup Interface:</strong> Provides user interaction with tab-based navigation</li>
+            </ul>
+
+            <h3>AI Providers Supported:</h3>
+            <ul>
+                <li><strong>OpenAI GPT-3.5 Turbo:</strong> Fast and cost-effective</li>
+                <li><strong>Anthropic Claude:</strong> High-quality understanding</li>
+                <li><strong>Google Gemini:</strong> Generous free tier</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Expected Results</h2>
+            <p>When testing the chat functionality, you should expect:</p>
+            
+            <h3>✅ Successful Scenarios:</h3>
+            <ul>
+                <li>AI can answer questions about the content on this page</li>
+                <li>AI references specific sections and information</li>
+                <li>AI provides contextual responses based on page content</li>
+                <li>Chat history is maintained during the session</li>
+            </ul>
+
+            <h3>⚠️ Potential Issues:</h3>
+            <ul>
+                <li>If content extraction fails, AI should explain it cannot access page content</li>
+                <li>If API key is missing, clear error message should appear</li>
+                <li>If network issues occur, appropriate timeout handling should work</li>
+            </ul>
+        </div>
+
+        <article>
+            <h2>📝 Sample Article Content</h2>
+            <p>This is a sample article section that demonstrates how the extension handles different HTML structures. The content extraction should prioritize this article element.</p>
+            
+            <p>The AI Page Summarizer extension uses intelligent content extraction algorithms to identify the most relevant text on a webpage. It filters out navigation elements, advertisements, and other non-content areas to focus on the main information.</p>
+            
+            <p>When you use the chat functionality, the AI has access to this extracted content and can provide detailed, contextual responses about what you're reading. This makes it a powerful tool for understanding complex articles, research papers, and other text-heavy content.</p>
+        </article>
+
+        <div class="test-section">
+            <h2>🎯 Chat Test Questions</h2>
+            <p>Copy and paste these questions into the chat to test different aspects:</p>
+            
+            <div style="background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                <strong>Basic Content Questions:</strong><br>
+                • "What is the main purpose of this test page?"<br>
+                • "How many AI providers are mentioned?"<br>
+                • "What are the expected results when testing?"
+            </div>
+            
+            <div style="background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                <strong>Technical Questions:</strong><br>
+                • "What extension architecture is used?"<br>
+                • "How does content extraction work?"<br>
+                • "What should happen if content extraction fails?"
+            </div>
+            
+            <div style="background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                <strong>Analysis Questions:</strong><br>
+                • "Summarize the key testing scenarios"<br>
+                • "What makes this extension different from others?"<br>
+                • "How can I troubleshoot issues?"
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p><em>This test page contains approximately 800 words of meaningful content that should be successfully extracted and made available to the AI chat functionality.</em></p>
+    </footer>
+
+    <script>
+        // Add some JavaScript to make the page more interactive
+        console.log('Content extraction test page loaded');
+        console.log('Page contains', document.body.innerText.length, 'characters of text');
+        
+        // Function to highlight content when testing
+        function highlightContent() {
+            const mainContent = document.querySelector('main');
+            if (mainContent) {
+                mainContent.style.backgroundColor = '#fffacd';
+                setTimeout(() => {
+                    mainContent.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+        
+        // Make function available globally
+        window.highlightContent = highlightContent;
+    </script>
+</body>
+</html>

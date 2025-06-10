@@ -15,16 +15,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errorState = document.getElementById('errorState');
   const successState = document.getElementById('successState');
   const initialState = document.getElementById('initialState');
-  
+
   const errorMessage = document.getElementById('errorMessage');
   const pageTitle = document.getElementById('pageTitle');
   const pageUrl = document.getElementById('pageUrl');
   const summaryText = document.getElementById('summaryText');
-  
+
   const retryBtn = document.getElementById('retryBtn');
   const copyBtn = document.getElementById('copyBtn');
   const newSummaryBtn = document.getElementById('newSummaryBtn');
   const settingsBtn = document.getElementById('settingsBtn');
+
+  // Tab elements
+  const summaryTab = document.getElementById('summaryTab');
+  const chatTab = document.getElementById('chatTab');
+  const summaryContent = document.getElementById('summaryContent');
+  const chatContent = document.getElementById('chatContent');
+
+  // Chat elements
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const sendChatBtn = document.getElementById('sendChatBtn');
+  const clearChatBtn = document.getElementById('clearChatBtn');
 
   // Debug elements
   const debugLink = document.getElementById('debugLink');
@@ -96,7 +108,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
   
-  newSummaryBtn.addEventListener('click', () => {
+  newSummaryBtn.addEventListener('click', async () => {
+    debugLog('New summary requested');
+
+    // Reset bubble state if it was triggered by bubble
+    const storageData = await chrome.storage.local.get(['bubbleTriggered', 'bubbleTabId']);
+    if (storageData.bubbleTriggered && storageData.bubbleTabId) {
+      try {
+        await chrome.tabs.sendMessage(storageData.bubbleTabId, {
+          action: 'resetBubbleState'
+        });
+      } catch (error) {
+        debugLog('Could not reset bubble state', error);
+      }
+    }
+
     showState('initial');
     chrome.storage.local.clear();
   });
@@ -105,11 +131,62 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.runtime.openOptionsPage();
   });
 
+  // Tab switching
+  summaryTab.addEventListener('click', () => {
+    switchTab('summary');
+  });
+
+  chatTab.addEventListener('click', () => {
+    switchTab('chat');
+  });
+
+  // Chat functionality
+  chatInput.addEventListener('input', () => {
+    sendChatBtn.disabled = !chatInput.value.trim();
+    autoResizeTextarea(chatInput);
+  });
+
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (chatInput.value.trim()) {
+        sendChatMessage();
+      }
+    }
+  });
+
+  sendChatBtn.addEventListener('click', () => {
+    if (chatInput.value.trim()) {
+      sendChatMessage();
+    }
+  });
+
+  clearChatBtn.addEventListener('click', () => {
+    clearChatHistory();
+  });
+
   // Debug event listeners
   debugLink.addEventListener('click', (e) => {
     e.preventDefault();
     debugLog('Opening debug panel');
     showDebugPanel();
+  });
+
+  // Reset bubble state when popup is closed
+  window.addEventListener('beforeunload', async () => {
+    const storageData = await chrome.storage.local.get(['bubbleTriggered', 'bubbleTabId', 'isProcessing']);
+
+    // Only reset if processing is complete and bubble was triggered
+    if (storageData.bubbleTriggered && storageData.bubbleTabId && !storageData.isProcessing) {
+      try {
+        await chrome.tabs.sendMessage(storageData.bubbleTabId, {
+          action: 'resetBubbleState'
+        });
+        await chrome.storage.local.remove(['bubbleTriggered', 'bubbleTabId']);
+      } catch (error) {
+        debugLog('Could not reset bubble state on popup close', error);
+      }
+    }
   });
 
   closeDebug.addEventListener('click', () => {
@@ -187,12 +264,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         pageTitle.textContent = data.currentTitle || 'Untitled Page';
         pageUrl.textContent = data.currentUrl || '';
         summaryText.textContent = response.summary;
-        
+
         showState('success');
-        
-        // Clear processing flag
+
+        // Clear processing flag and check if bubble was triggered
+        const storageData = await chrome.storage.local.get(['bubbleTriggered', 'bubbleTabId']);
         await chrome.storage.local.set({ isProcessing: false });
-        
+
+        // If summarization was triggered by bubble, notify content script
+        if (storageData.bubbleTriggered && storageData.bubbleTabId) {
+          try {
+            await chrome.tabs.sendMessage(storageData.bubbleTabId, {
+              action: 'updateBubbleState',
+              state: 'success'
+            });
+            // Clear bubble flags
+            await chrome.storage.local.remove(['bubbleTriggered', 'bubbleTabId']);
+          } catch (error) {
+            debugLog('Could not update bubble state on success', error);
+          }
+        }
+
       } else {
         throw new Error(response.error || 'Failed to generate summary');
       }
@@ -201,9 +293,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Summarization error:', error);
       errorMessage.textContent = error.message;
       showState('error');
-      
-      // Clear processing flag
+
+      // Clear processing flag and check if bubble was triggered
+      const storageData = await chrome.storage.local.get(['bubbleTriggered', 'bubbleTabId']);
       await chrome.storage.local.set({ isProcessing: false });
+
+      // If summarization was triggered by bubble, notify content script of error
+      if (storageData.bubbleTriggered && storageData.bubbleTabId) {
+        try {
+          await chrome.tabs.sendMessage(storageData.bubbleTabId, {
+            action: 'updateBubbleState',
+            state: 'error'
+          });
+          // Clear bubble flags
+          await chrome.storage.local.remove(['bubbleTriggered', 'bubbleTabId']);
+        } catch (msgError) {
+          debugLog('Could not update bubble state on error', msgError);
+        }
+      }
     }
   }
 });
@@ -299,3 +406,261 @@ async function exportDebugInfo() {
     alert(`Export failed: ${error.message}`);
   }
 }
+
+// Tab switching functionality
+function switchTab(tabName) {
+  const summaryTab = document.getElementById('summaryTab');
+  const chatTab = document.getElementById('chatTab');
+  const summaryContent = document.getElementById('summaryContent');
+  const chatContent = document.getElementById('chatContent');
+
+  // Update tab buttons
+  summaryTab.classList.toggle('active', tabName === 'summary');
+  chatTab.classList.toggle('active', tabName === 'chat');
+
+  // Update content visibility
+  summaryContent.classList.toggle('active', tabName === 'summary');
+  chatContent.style.display = tabName === 'chat' ? 'flex' : 'none';
+
+  debugLog(`Switched to ${tabName} tab`);
+}
+
+// Chat functionality
+let chatHistory = [];
+
+async function sendChatMessage() {
+  const chatInput = document.getElementById('chatInput');
+  const chatMessages = document.getElementById('chatMessages');
+  const message = chatInput.value.trim();
+
+  if (!message) return;
+
+  debugLog('Sending chat message', { message });
+
+  // Check if background script is available
+  try {
+    await chrome.runtime.sendMessage({ action: 'ping' });
+  } catch (error) {
+    addChatMessage('assistant', 'Extension background script is not responding. Please try refreshing the page or reloading the extension.');
+    return;
+  }
+
+  // Clear welcome message if it exists
+  const welcomeMessage = chatMessages.querySelector('.chat-welcome');
+  if (welcomeMessage) {
+    welcomeMessage.remove();
+  }
+
+  // Add user message
+  addChatMessage('user', message);
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  document.getElementById('sendChatBtn').disabled = true;
+
+  // Show loading indicator
+  const loadingElement = addChatLoading();
+
+  try {
+    // Get current page content and settings
+    let data = await chrome.storage.local.get(['currentContent', 'currentUrl', 'currentTitle']);
+    const settings = await chrome.storage.sync.get(['apiKey', 'provider']);
+
+    // If no content is stored, try to extract it from the current page
+    if (!data.currentContent) {
+      debugLog('No stored content found, extracting from current page...');
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab) {
+          const extractedData = await chrome.tabs.sendMessage(tab.id, { action: "extractContent" });
+          if (extractedData && extractedData.success) {
+            data = {
+              currentContent: extractedData.content,
+              currentUrl: tab.url,
+              currentTitle: tab.title
+            };
+            // Store the extracted content for future use
+            await chrome.storage.local.set(data);
+            debugLog('Content extracted successfully', { contentLength: data.currentContent?.length || 0 });
+          }
+        }
+      } catch (extractError) {
+        debugLog('Failed to extract content', extractError);
+        // Continue with empty content - AI can still provide general help
+      }
+    }
+
+    debugLog('Chat data retrieved', {
+      hasContent: !!data.currentContent,
+      contentLength: data.currentContent?.length || 0,
+      contentPreview: data.currentContent ? data.currentContent.substring(0, 100) + '...' : 'No content',
+      hasApiKey: !!settings.apiKey,
+      provider: settings.provider,
+      pageTitle: data.currentTitle,
+      pageUrl: data.currentUrl
+    });
+
+    if (!settings.apiKey) {
+      throw new Error('API key not configured. Please set it in the extension settings.');
+    }
+
+    // Warn user if no content is available
+    if (!data.currentContent || data.currentContent.trim().length < 50) {
+      debugLog('Warning: Limited or no page content available');
+      // Add a helpful message to the chat
+      if (!data.currentContent) {
+        addChatMessage('assistant', '⚠️ I couldn\'t extract content from this page. You can still ask me general questions, but for page-specific questions, try right-clicking and selecting "Summarize this page" first.');
+        loadingElement.remove();
+        return;
+      }
+    }
+
+    // Send chat message to background script with timeout
+    const response = await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Request timed out. Please try again.'));
+      }, 30000); // 30 second timeout
+
+      chrome.runtime.sendMessage({
+        action: 'chat',
+        message: message,
+        chatHistory: chatHistory.slice(-6), // Limit history to last 6 messages to avoid token limits
+        pageContent: data.currentContent ? data.currentContent.substring(0, 8000) : '', // Limit content length
+        pageUrl: data.currentUrl,
+        pageTitle: data.currentTitle,
+        apiKey: settings.apiKey,
+        provider: settings.provider || 'openai'
+      }, (response) => {
+        clearTimeout(timeout);
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else if (!response) {
+          reject(new Error('No response received from background script'));
+        } else {
+          resolve(response);
+        }
+      });
+    });
+
+    // Remove loading indicator
+    loadingElement.remove();
+
+    if (response.success) {
+      // Add assistant response
+      addChatMessage('assistant', response.reply);
+
+      // Update chat history
+      chatHistory.push(
+        { role: 'user', content: message },
+        { role: 'assistant', content: response.reply }
+      );
+
+      debugLog('Chat message sent successfully');
+    } else {
+      throw new Error(response.error || 'Failed to get chat response');
+    }
+
+  } catch (error) {
+    debugLog('Chat error', error);
+    loadingElement.remove();
+
+    let errorMessage = error.message;
+
+    // Provide more helpful error messages
+    if (errorMessage.includes('timed out')) {
+      errorMessage = 'The request timed out. Please try again with a shorter message or check your internet connection.';
+    } else if (errorMessage.includes('API key')) {
+      errorMessage = 'There\'s an issue with your API key. Please check your settings and make sure your API key is valid.';
+    } else if (errorMessage.includes('rate limit')) {
+      errorMessage = 'You\'ve hit the rate limit. Please wait a moment and try again.';
+    } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+      errorMessage = 'Network error. Please check your internet connection and try again.';
+    }
+
+    addChatMessage('assistant', `Sorry, I encountered an error: ${errorMessage}`);
+  }
+}
+
+function addChatMessage(sender, content) {
+  const chatMessages = document.getElementById('chatMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message ${sender}`;
+
+  const bubble = document.createElement('div');
+  bubble.className = `message-bubble ${sender}`;
+  bubble.textContent = content;
+
+  const time = document.createElement('div');
+  time.className = 'message-time';
+  time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  messageDiv.appendChild(bubble);
+  messageDiv.appendChild(time);
+  chatMessages.appendChild(messageDiv);
+
+  // Scroll to bottom
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addChatLoading() {
+  const chatMessages = document.getElementById('chatMessages');
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'chat-message assistant';
+
+  const loadingBubble = document.createElement('div');
+  loadingBubble.className = 'chat-loading';
+  loadingBubble.innerHTML = `
+    <span>AI is thinking</span>
+    <div class="chat-loading-dots">
+      <div class="chat-loading-dot"></div>
+      <div class="chat-loading-dot"></div>
+      <div class="chat-loading-dot"></div>
+    </div>
+  `;
+
+  loadingDiv.appendChild(loadingBubble);
+  chatMessages.appendChild(loadingDiv);
+
+  // Scroll to bottom
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  return loadingDiv;
+}
+
+function clearChatHistory() {
+  const chatMessages = document.getElementById('chatMessages');
+  chatHistory = [];
+
+  // Clear all messages
+  chatMessages.innerHTML = `
+    <div class="chat-welcome">
+      <div class="chat-welcome-icon">💬</div>
+      <h4>Start a conversation</h4>
+      <p>Ask questions about the current page content, request explanations, or get more details about specific topics.</p>
+    </div>
+  `;
+
+  debugLog('Chat history cleared');
+}
+
+function autoResizeTextarea(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 80) + 'px';
+}
+
+// Debug function to test content extraction
+async function testContentExtraction() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab) {
+      const result = await chrome.tabs.sendMessage(tab.id, { action: "extractContent" });
+      console.log('Content extraction test:', result);
+      return result;
+    }
+  } catch (error) {
+    console.error('Content extraction test failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Make it available globally for debugging
+window.testContentExtraction = testContentExtraction;
