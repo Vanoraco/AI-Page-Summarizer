@@ -8,18 +8,27 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  width: 400px;
+  width: 500px;
+  min-width: 500px;
+  max-width: 600px;
   min-height: 500px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #e6e7ee;
   color: #333;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
   display: flex;
   flex-direction: column;
   min-height: 500px;
-  background: white;
+  width: 100%;
+  background: #e6e7ee;
   margin: 0;
+  border-radius: 20px;
+  box-shadow:
+    20px 20px 60px #bebfc5,
+    -20px -20px 60px #ffffff;
 }
 
 /* Header */
@@ -27,10 +36,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px 24px;
+  background: #e6e7ee;
+  color: #4a5568;
+  border-radius: 20px 20px 0 0;
+  box-shadow:
+    inset 8px 8px 16px #d1d2d9,
+    inset -8px -8px 16px #fbfcff;
 }
 
 .logo {
@@ -40,30 +52,41 @@ body {
 }
 
 .logo h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .settings-btn {
-  background: none;
+  background: #e6e7ee;
   border: none;
-  color: white;
+  color: #667eea;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow:
+    6px 6px 12px #d1d2d9,
+    -6px -6px 12px #fbfcff;
 }
 
 .settings-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 6px 6px 12px #d1d2d9,
+    inset -6px -6px 12px #fbfcff;
+  transform: scale(0.95);
 }
 
 /* Main Content */
 .main {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
+  background: #e6e7ee;
 }
 
 .state {
@@ -77,16 +100,19 @@ body {
 
 /* Loading State */
 .loading-state {
-  gap: 16px;
+  gap: 20px;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e6e7ee;
+  border-top: 4px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  box-shadow:
+    8px 8px 16px #d1d2d9,
+    -8px -8px 16px #fbfcff;
 }
 
 @keyframes spin {
@@ -97,6 +123,8 @@ body {
 /* Error State */
 .error-state {
   gap: 16px;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .error-icon {
@@ -106,12 +134,14 @@ body {
 .error-state h3 {
   color: #e74c3c;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .error-state p {
   color: #666;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   line-height: 1.5;
+  text-align: center;
 }
 
 /* Success State */
@@ -122,10 +152,14 @@ body {
 }
 
 .page-info {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
+  background: #e6e7ee;
+  padding: 20px;
+  border-radius: 16px;
+  border: none;
+  box-shadow:
+    inset 8px 8px 16px #d1d2d9,
+    inset -8px -8px 16px #fbfcff;
+  margin-bottom: 20px;
 }
 
 .page-info h3 {
@@ -148,13 +182,19 @@ body {
 }
 
 .summary-text {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-  line-height: 1.6;
-  color: #444;
-  border: 1px solid #e9ecef;
-  margin-bottom: 20px;
+  background: #e6e7ee;
+  padding: 24px;
+  border-radius: 16px;
+  line-height: 1.8;
+  color: #4a5568;
+  border: none;
+  margin-bottom: 24px;
+  font-size: 15px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-shadow:
+    inset 10px 10px 20px #d1d2d9,
+    inset -10px -10px 20px #fbfcff;
 }
 
 .actions {
@@ -214,61 +254,91 @@ body {
 
 /* Buttons */
 .btn {
-  padding: 10px 16px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   text-decoration: none;
+  background: #e6e7ee;
+  color: #4a5568;
+  box-shadow:
+    8px 8px 16px #d1d2d9,
+    -8px -8px 16px #fbfcff;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   flex: 1;
+  box-shadow:
+    8px 8px 16px #d1d2d9,
+    -8px -8px 16px #fbfcff;
+}
+
+/* Fix for buttons in error state - don't stretch */
+.error-state .btn-primary {
+  flex: none;
+  width: auto;
+  min-width: 120px;
+  align-self: center;
+  text-align: center;
+  justify-content: center;
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transform: scale(0.98);
+  box-shadow:
+    inset 8px 8px 16px rgba(102, 126, 234, 0.2),
+    inset -8px -8px 16px rgba(255, 255, 255, 0.8);
 }
 
 .btn-secondary {
-  background: #f8f9fa;
-  color: #666;
-  border: 1px solid #e9ecef;
+  background: #e6e7ee;
+  color: #667eea;
+  border: none;
 }
 
 .btn-secondary:hover {
-  background: #e9ecef;
-  color: #333;
+  box-shadow:
+    inset 8px 8px 16px #d1d2d9,
+    inset -8px -8px 16px #fbfcff;
+  transform: scale(0.98);
 }
 
 /* Footer */
 .footer {
-  padding: 16px 20px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+  padding: 20px 24px;
+  background: #e6e7ee;
+  border-top: none;
   text-align: center;
+  border-radius: 0 0 20px 20px;
+  box-shadow:
+    inset 8px 8px 16px #d1d2d9,
+    inset -8px -8px 16px #fbfcff;
 }
 
 .footer p {
   font-size: 12px;
-  color: #666;
+  color: #718096;
 }
 
 .footer a {
   color: #667eea;
   text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .footer a:hover {
-  text-decoration: underline;
+  color: #764ba2;
+  text-decoration: none;
 }
 
 /* Debug Panel */
@@ -368,9 +438,10 @@ body {
 }
 
 /* Responsive adjustments */
-@media (max-width: 420px) {
+@media (max-width: 520px) {
   body {
     width: 100vw;
+    min-width: 320px;
   }
 
   .container {
@@ -383,5 +454,13 @@ body {
 
   .debug-actions .btn {
     width: 100%;
+  }
+}
+
+/* Larger screens - allow even more width */
+@media (min-width: 1200px) {
+  body {
+    width: 600px;
+    max-width: 700px;
   }
 }
