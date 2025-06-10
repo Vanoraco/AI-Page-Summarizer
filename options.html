@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Page Summarizer - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <h1>AI Page Summarizer</h1>
+          <p>Extension Settings</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="settings-section">
+        <h2>AI Provider Configuration</h2>
+        <p class="section-description">
+          Choose your preferred AI service and configure your API key to enable summarization.
+        </p>
+
+        <div class="form-group">
+          <label for="provider">AI Provider</label>
+          <select id="provider" class="form-control">
+            <option value="openai">OpenAI (GPT-3.5 Turbo)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+          <small class="help-text">Select the AI service you want to use for summarization.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="apiKey">API Key</label>
+          <div class="input-group">
+            <input type="password" id="apiKey" class="form-control" placeholder="Enter your API key">
+            <button type="button" id="toggleApiKey" class="btn-toggle">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+          <small class="help-text">
+            Your API key is stored locally and never shared. 
+            <a href="#" id="getApiKeyLink" target="_blank">Get an API key</a>
+          </small>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="saveBtn" class="btn btn-primary">Save Settings</button>
+          <button type="button" id="testBtn" class="btn btn-secondary">Test Connection</button>
+        </div>
+
+        <div id="statusMessage" class="status-message" style="display: none;"></div>
+      </div>
+
+      <div class="settings-section">
+        <h2>How to Get API Keys</h2>
+        
+        <div class="provider-info">
+          <h3>OpenAI</h3>
+          <ol>
+            <li>Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a></li>
+            <li>Sign in or create an account</li>
+            <li>Click "Create new secret key"</li>
+            <li>Copy the key and paste it above</li>
+          </ol>
+          <p class="pricing-info">
+            <strong>Pricing:</strong> ~$0.002 per 1K tokens (very affordable for summaries)
+          </p>
+        </div>
+
+        <div class="provider-info">
+          <h3>Anthropic (Claude)</h3>
+          <ol>
+            <li>Visit <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a></li>
+            <li>Sign in or create an account</li>
+            <li>Go to API Keys section</li>
+            <li>Create a new key and copy it</li>
+          </ol>
+          <p class="pricing-info">
+            <strong>Pricing:</strong> ~$0.25 per 1M tokens (input), ~$1.25 per 1M tokens (output)
+          </p>
+        </div>
+
+        <div class="provider-info">
+          <h3>Google Gemini</h3>
+          <ol>
+            <li>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+            <li>Sign in with your Google account</li>
+            <li>Click "Create API Key"</li>
+            <li>Copy the generated API key</li>
+          </ol>
+          <p class="pricing-info">
+            <strong>Pricing:</strong> Free tier available, then ~$0.075 per 1M tokens (very affordable)
+          </p>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Privacy & Security</h2>
+        <div class="privacy-info">
+          <div class="privacy-item">
+            <div class="privacy-icon">🔒</div>
+            <div>
+              <h4>Local Storage</h4>
+              <p>Your API key is stored locally in your browser and never transmitted to our servers.</p>
+            </div>
+          </div>
+          <div class="privacy-item">
+            <div class="privacy-icon">🌐</div>
+            <div>
+              <h4>Direct API Calls</h4>
+              <p>The extension communicates directly with your chosen AI provider. We don't see your data.</p>
+            </div>
+          </div>
+          <div class="privacy-item">
+            <div class="privacy-icon">🗑️</div>
+            <div>
+              <h4>No Data Retention</h4>
+              <p>Page content is processed in real-time and not stored anywhere.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2024 AI Page Summarizer. Built with ❤️ for productivity.</p>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

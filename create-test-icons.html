@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Test Icons for AI Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-preview {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .icon-item {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .icon-item canvas {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .instructions {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .download-links {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .download-links a {
+            display: inline-block;
+            margin: 5px 10px;
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .download-links a:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 AI Summarizer Test Icons Generator</h1>
+        
+        <div class="instructions">
+            <h3>Quick Icon Creation for Testing</h3>
+            <p>This tool creates simple test icons for the AI Page Summarizer extension. These are basic colored squares with text - perfect for testing the extension functionality.</p>
+            <p><strong>For production:</strong> Create professional icons using design tools like Figma, Canva, or hire a designer.</p>
+        </div>
+
+        <div class="controls">
+            <button onclick="generateIcons()">Generate Test Icons</button>
+            <button onclick="downloadAll()" id="downloadBtn" style="display: none;">Download All Icons</button>
+        </div>
+
+        <div class="icon-preview" id="iconPreview"></div>
+        
+        <div class="download-links" id="downloadLinks"></div>
+
+        <div class="instructions">
+            <h3>How to Use These Icons:</h3>
+            <ol>
+                <li>Click "Generate Test Icons" above</li>
+                <li>Click "Download All Icons" to save them</li>
+                <li>Place the downloaded PNG files in your extension's <code>icons/</code> folder</li>
+                <li>Make sure the files are named exactly: <code>icon16.png</code>, <code>icon32.png</code>, <code>icon48.png</code>, <code>icon128.png</code></li>
+                <li>Load your extension in Chrome</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const iconSizes = [16, 32, 48, 128];
+        const iconData = [];
+
+        function generateIcons() {
+            const preview = document.getElementById('iconPreview');
+            const downloadLinks = document.getElementById('downloadLinks');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            preview.innerHTML = '';
+            downloadLinks.innerHTML = '';
+            iconData.length = 0;
+
+            iconSizes.forEach(size => {
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                // Create gradient background
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+
+                // Add border
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = Math.max(1, size / 32);
+                ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, size - ctx.lineWidth, size - ctx.lineWidth);
+
+                // Add text (AI symbol)
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `bold ${Math.floor(size * 0.4)}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('AI', size/2, size/2);
+
+                // Add small document icon for larger sizes
+                if (size >= 32) {
+                    ctx.fillStyle = '#ffffff';
+                    const docSize = size * 0.15;
+                    const docX = size * 0.75;
+                    const docY = size * 0.75;
+                    
+                    // Simple document shape
+                    ctx.fillRect(docX - docSize/2, docY - docSize/2, docSize, docSize * 1.2);
+                    ctx.fillStyle = '#667eea';
+                    ctx.fillRect(docX - docSize/3, docY - docSize/3, docSize * 0.6, docSize * 0.1);
+                    ctx.fillRect(docX - docSize/3, docY - docSize/6, docSize * 0.6, docSize * 0.1);
+                    ctx.fillRect(docX - docSize/3, docY, docSize * 0.4, docSize * 0.1);
+                }
+
+                // Store canvas data
+                iconData.push({
+                    size: size,
+                    canvas: canvas,
+                    dataUrl: canvas.toDataURL('image/png')
+                });
+
+                // Create preview item
+                const item = document.createElement('div');
+                item.className = 'icon-item';
+                item.innerHTML = `
+                    <canvas width="${size}" height="${size}" style="width: ${Math.min(size, 64)}px; height: ${Math.min(size, 64)}px;"></canvas>
+                    <div><strong>${size}x${size}px</strong></div>
+                    <div>icon${size}.png</div>
+                `;
+                
+                // Copy canvas to preview
+                const previewCanvas = item.querySelector('canvas');
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.drawImage(canvas, 0, 0);
+                
+                preview.appendChild(item);
+
+                // Create download link
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `icon${size}.png`;
+                link.textContent = `Download icon${size}.png`;
+                downloadLinks.appendChild(link);
+            });
+
+            downloadLinks.style.display = 'block';
+            downloadBtn.style.display = 'inline-block';
+        }
+
+        function downloadAll() {
+            iconData.forEach(icon => {
+                const link = document.createElement('a');
+                link.href = icon.dataUrl;
+                link.download = `icon${icon.size}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+            
+            alert('All icons downloaded! Place them in your extension\'s icons/ folder.');
+        }
+
+        // Generate icons on page load
+        window.addEventListener('load', generateIcons);
+    </script>
+</body>
+</html>

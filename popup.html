@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Page Summarizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <h1>AI Summarizer</h1>
+      </div>
+      <button id="settingsBtn" class="settings-btn" title="Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="main">
+      <!-- Loading State -->
+      <div id="loadingState" class="state loading-state">
+        <div class="spinner"></div>
+        <p>Analyzing page content...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="state error-state" style="display: none;">
+        <div class="error-icon">⚠️</div>
+        <h3>Something went wrong</h3>
+        <p id="errorMessage">Unable to summarize this page.</p>
+        <button id="retryBtn" class="btn btn-primary">Try Again</button>
+      </div>
+
+      <!-- Success State -->
+      <div id="successState" class="state success-state" style="display: none;">
+        <div class="page-info">
+          <h3 id="pageTitle">Page Title</h3>
+          <p id="pageUrl">https://example.com</p>
+        </div>
+        
+        <div class="summary-container">
+          <h4>Summary</h4>
+          <div id="summaryText" class="summary-text"></div>
+        </div>
+        
+        <div class="actions">
+          <button id="copyBtn" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Copy
+          </button>
+          <button id="newSummaryBtn" class="btn btn-primary">New Summary</button>
+        </div>
+      </div>
+
+      <!-- Initial State -->
+      <div id="initialState" class="state initial-state" style="display: none;">
+        <div class="welcome">
+          <h3>Welcome to AI Summarizer</h3>
+          <p>Right-click on any webpage and select "Summarize this page" to get started.</p>
+        </div>
+        
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">🤖</div>
+            <h4>AI-Powered</h4>
+            <p>Uses advanced AI to understand and summarize content</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <h4>Fast & Accurate</h4>
+            <p>Get concise summaries in seconds</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🔒</div>
+            <h4>Privacy First</h4>
+            <p>Your data is processed securely</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Powered by AI • <a href="#" id="aboutLink">About</a> • <a href="#" id="debugLink">Debug</a></p>
+    </footer>
+
+    <!-- Debug Panel (hidden by default) -->
+    <div id="debugPanel" class="debug-panel" style="display: none;">
+      <div class="debug-header">
+        <h3>Debug Information</h3>
+        <button id="closeDebug" class="btn-close">×</button>
+      </div>
+      <div class="debug-content">
+        <div class="debug-section">
+          <h4>Extension Status</h4>
+          <div id="debugStatus">Loading...</div>
+        </div>
+        <div class="debug-section">
+          <h4>Storage Data</h4>
+          <pre id="debugStorage">Loading...</pre>
+        </div>
+        <div class="debug-section">
+          <h4>Console Logs</h4>
+          <div id="debugLogs">Check browser console for detailed logs</div>
+        </div>
+        <div class="debug-actions">
+          <button id="refreshDebug" class="btn btn-secondary">Refresh</button>
+          <button id="clearStorage" class="btn btn-secondary">Clear Storage</button>
+          <button id="exportDebug" class="btn btn-secondary">Export Debug Info</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

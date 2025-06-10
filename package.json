@@ -1,0 +1,40 @@
+{
+  "name": "ai-page-summarizer",
+  "version": "1.0.0",
+  "description": "Chrome extension that uses AI to summarize webpage content with a simple right-click",
+  "main": "background.js",
+  "scripts": {
+    "build": "echo 'No build process needed for this extension'",
+    "test": "echo 'No tests configured yet'",
+    "lint": "echo 'No linting configured yet'",
+    "package": "zip -r ai-page-summarizer.zip . -x '*.git*' 'node_modules/*' '*.DS_Store' 'package.json' 'package-lock.json'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "ai",
+    "summarization",
+    "openai",
+    "anthropic",
+    "productivity",
+    "reading",
+    "content-extraction"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ai-page-summarizer"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ai-page-summarizer/issues"
+  },
+  "homepage": "https://github.com/yourusername/ai-page-summarizer#readme",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "Chrome >= 88"
+  ]
+}
